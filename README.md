@@ -20,9 +20,9 @@
        * содержать скомпилированное решение;
        * __не__ содержать скомпилированные самостоятельно тесты.
     * простой вариант:
-        ```java -p . -m info.kgeorgiy.java.advanced.walk Walk <полное имя класса>```
+        ```java -cp . -p . -m info.kgeorgiy.java.advanced.walk Walk <полное имя класса>```
     * сложный вариант:
-        ```java -p . -m info.kgeorgiy.java.advanced.walk RecursiveWalk <полное имя класса>```
+        ```java -cp . -p . -m info.kgeorgiy.java.advanced.walk RecursiveWalk <полное имя класса>```
 
 Исходный код тестов:
 
