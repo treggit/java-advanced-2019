@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
+ * Tests for hard version
+ * of <a href="https://www.kgeorgiy.info/courses/java-advanced/homeworks.html#homework-walk">Walk</a> homework
+ * for <a href="https://www.kgeorgiy.info/courses/java-advanced/">Java Advanced</a> course.
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

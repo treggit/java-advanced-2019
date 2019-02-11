@@ -15,6 +15,8 @@ import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 /**
+ * Tests base class.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 @RunWith(JUnit4.class)
@@ -33,11 +35,11 @@ public class BaseTest {
         };
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unused"})
     public static <T> T createCUT() {
         try {
             return (T) loadClass().getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+        } catch (final InstantiationException | IllegalAccessException | NoSuchMethodException e) {
             throw new AssertionError(e);
         } catch (final InvocationTargetException e) {
             throw new AssertionError(e.getCause());
@@ -46,7 +48,7 @@ public class BaseTest {
 
     public static Class<?> loadClass() {
         final String className = System.getProperty(CUT_PROPERTY);
-        Assert.assertTrue("Class name not specified", className != null);
+        Assert.assertNotNull("Class name not specified", className);
 
         try {
             return Class.forName(className);
