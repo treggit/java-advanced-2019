@@ -1,0 +1,2 @@
+javac -d out/walk_build java/ru.ifmo.rain.shelepov/walk/WalkException.java java/ru.ifmo.rain.shelepov/walk/FileVisitor.java java/ru.ifmo.rain.shelepov/walk/RecursiveWalk.java
+java -cp out/walk_build -p artifacts:lib -m info.kgeorgiy.java.advanced.walk RecursiveWalk ru.ifmo.rain.shelepov.walk.RecursiveWalk
