@@ -12,9 +12,9 @@ import static java.nio.file.FileVisitResult.CONTINUE;
 
 public class FileVisitor extends SimpleFileVisitor<Path> {
 
-    final private int BUFFER_SIZE = 4096;
-    final private int FNV_PRIME = 0x01000193;
-    final private int INITIAL = 0x811c9dc5;
+    private final static int BUFFER_SIZE = 4096;
+    private final static int FNV_PRIME = 0x01000193;
+    private final static int INITIAL = 0x811c9dc5;
     private Writer writer;
 
     public FileVisitor(Writer writer) {

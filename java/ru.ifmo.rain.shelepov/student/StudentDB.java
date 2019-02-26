@@ -141,7 +141,7 @@ public class StudentDB implements StudentGroupQuery {
 
     private String getLargestGroup(Stream<Map.Entry<String, List<Student>>> students, Comparator<Map.Entry<String, List<Student>>> comparator) {
         return students
-                .max(comparator)
+                .max(comparator.thenComparing(Map.Entry::getKey, Comparator.reverseOrder()))
                 .map(Map.Entry::getKey)
                 .orElse("");
     }
@@ -149,8 +149,7 @@ public class StudentDB implements StudentGroupQuery {
     @Override
     public String getLargestGroup(Collection<Student> students) {
         return getLargestGroup(getGroupsMapStream(students),
-                Comparator.comparingInt((Map.Entry<String, List<Student>> entry) -> entry.getValue().size())
-                .thenComparing(Map.Entry::getKey, Comparator.reverseOrder()));
+                Comparator.comparingInt((Map.Entry<String, List<Student>> entry) -> entry.getValue().size()));
     }
 
     @Override
@@ -158,7 +157,6 @@ public class StudentDB implements StudentGroupQuery {
         return getLargestGroup(getGroupsMapStream(students),
                 Comparator.comparing((Map.Entry<String, List<Student>> entry) -> entry.getValue().stream()
                                                                                     .map(Student::getFirstName)
-                                                                                    .collect(Collectors.toSet()).size())
-                .thenComparing(Map.Entry::getKey, Comparator.reverseOrder()));
+                                                                                    .collect(Collectors.toSet()).size()));
     }
 }

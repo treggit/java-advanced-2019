@@ -37,7 +37,7 @@ public class RecursiveWalk {
 
     private static void process(String input, String output) throws WalkException {
         check(input, output);
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(input), Charset.forName("UTF-8"))) {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(input))) {
             try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(output))) {
                 try {
                     String path;
@@ -46,7 +46,8 @@ public class RecursiveWalk {
                         try {
                             Files.walkFileTree(Paths.get(path), visitor);
                         } catch (Exception e) {
-                            writer.write("00000000 " + path + "\n");
+                            writer.write("00000000 " + path);
+                            writer.newLine();
                         }
                     }
                 } catch (IOException e) {
@@ -61,6 +62,10 @@ public class RecursiveWalk {
     }
 
     public static void main(String[] args) {
+        if (args == null) {
+            System.err.println("Args is null!");
+            return;
+        }
         if (args.length != 2) {
             System.err.println("Two arguments expected: <input file> <output file>");
             return;
