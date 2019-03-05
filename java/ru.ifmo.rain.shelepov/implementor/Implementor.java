@@ -3,7 +3,6 @@ package ru.ifmo.rain.shelepov.implementor;
 import info.kgeorgiy.java.advanced.implementor.Impler;
 import info.kgeorgiy.java.advanced.implementor.ImplerException;
 
-import javax.swing.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.*;
@@ -13,7 +12,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
