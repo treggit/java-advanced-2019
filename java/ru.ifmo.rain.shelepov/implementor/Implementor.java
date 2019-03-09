@@ -3,31 +3,26 @@ package ru.ifmo.rain.shelepov.implementor;
 import info.kgeorgiy.java.advanced.implementor.Impler;
 import info.kgeorgiy.java.advanced.implementor.ImplerException;
 
-import javax.swing.*;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.reflect.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Implementor implements Impler {
 
-    private final String IMPL = "Impl";
-    private final String JAVA = ".java";
-    private final String TAB = "    ";
-    private final String COMMA = ",";
-    private final String EOL = ";" + System.lineSeparator();
-    private final String EMPTY_LINE = System.lineSeparator();
-    private final String SPACE = " ";
-    private final String BEGIN = "{" + System.lineSeparator();
-    private final String END = "}" + System.lineSeparator();
+    private static final String IMPL = "Impl";
+    private static final String JAVA = ".java";
+    private static final String TAB = "    ";
+    private static final String COMMA = ",";
+    private static final String EOL = ";" + System.lineSeparator();
+    private static final String EMPTY_LINE = System.lineSeparator();
+    private static final String SPACE = " ";
+    private static final String BEGIN = "{" + System.lineSeparator();
+    private static final String END = "}" + System.lineSeparator();
 
     public Implementor() {}
 
@@ -37,15 +32,26 @@ public class Implementor implements Impler {
                 .resolve(filename + IMPL + JAVA);
     }
 
-    @Override
-    public void implement(Class<?> token, Path root) throws ImplerException {
+    private void checkToken(Class<?> token) throws ImplerException {
         if (token.isPrimitive() || token.isArray()) {
             throw new ImplerException("target is primitive or an array");
         }
 
+        if (Modifier.isFinal(token.getModifiers())) {
+            throw new ImplerException("can't extend final class");
+        }
+
+        if (token.getSimpleName().equals("Enum")) {
+            throw new ImplerException("can't extend enum class");
+        }
+    }
+
+    @Override
+    public void implement(Class<?> token, Path root) throws ImplerException {
+        checkToken(token);
+
         Path path = getFullPath(root, token.getPackage(), token.getSimpleName());
         createOutFile(path);
-
         generateComponents(token, path);
     }
 
@@ -70,8 +76,8 @@ public class Implementor implements Impler {
     }
 
     private List<Constructor> getConstructors(Class<?> token) {
-        return Arrays.stream(token.getConstructors())
-                .filter(constructor -> Modifier.isPublic(constructor.getModifiers()))
+        return Arrays.stream(token.getDeclaredConstructors())
+                .filter(constructor -> !Modifier.isPrivate(constructor.getModifiers()))
                 .collect(Collectors.toList());
     }
 
@@ -92,27 +98,70 @@ public class Implementor implements Impler {
 
     private boolean canOverride(Method method) {
         int mod = method.getModifiers();
-        return Modifier.isAbstract(mod) && !Modifier.isPrivate(mod) && !Modifier.isFinal(mod);
+        return Modifier.isAbstract(mod);
+    }
+
+    private class MethodWrapper {
+        private Method method;
+
+        private static final int MOD = (int) 1e7 + 3;
+        private static final int BASE = 31;
+
+        public MethodWrapper(Method method) {
+            this.method = method;
+        }
+
+        public Method getMethod() {
+            return method;
+        }
+
+        public int hashCode() {
+            return ((Arrays.hashCode(method.getParameterTypes())
+                    + method.getReturnType().hashCode() * BASE) % MOD
+                    + method.getName().hashCode() * BASE * BASE) % MOD;
+        }
+
+        public boolean equals(Object object) {
+            if (object == null) {
+                return false;
+            }
+
+            if (object instanceof MethodWrapper) {
+                Method m = ((MethodWrapper) object).getMethod();
+                return method.getReturnType().equals(m.getReturnType())
+                        && method.getName().equals(m.getName())
+                        && Arrays.equals(method.getParameterTypes(), m.getParameterTypes());
+            }
+            return false;
+        }
+    }
+
+    private Set<MethodWrapper> convertToWrapper(Method[] methods) {
+        return Arrays.stream(methods)
+                .map(MethodWrapper::new)
+                .collect(Collectors.toSet());
     }
 
     private List<Method> getMethods(Class<?> token) {
-        Stream<Method> methods = Arrays.stream(token.getMethods())
-                .filter(this::canOverride).distinct();
-        while (token != null) {
-            methods = Stream.concat(methods, Arrays.stream(token.getDeclaredMethods())
-                    .filter(this::canOverride)).distinct();
+        Set<MethodWrapper> methods = convertToWrapper(token.getMethods());
 
+        while (token != null) {
+            methods.addAll(convertToWrapper(token.getDeclaredMethods()));
             token = token.getSuperclass();
         }
 
-        return methods.collect(Collectors.toList());
+        return methods.stream()
+                .map(MethodWrapper::getMethod)
+                .collect(Collectors.toList());
     }
 
     private void generateMethods(Class<?> token, BufferedWriter writer, String indent) throws IOException {
         List<Method> methods = getMethods(token);
 
         for (Method method : methods) {
-            writer.write(generateExecutable(method, indent) + EMPTY_LINE);
+            if (canOverride(method)) {
+                writer.write(generateExecutable(method, indent) + EMPTY_LINE);
+            }
         }
     }
 
@@ -161,8 +210,7 @@ public class Implementor implements Impler {
                     .append(exceptions);
         }
 
-        declaration.append(SPACE)
-                .append(BEGIN);
+        declaration.append(SPACE).append(BEGIN);
 
         return declaration.toString();
     }
