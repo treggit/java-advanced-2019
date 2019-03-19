@@ -1,0 +1,2 @@
+javac -d out/concurrent_build -cp artifacts/info.kgeorgiy.java.advanced.concurrent.jar java/ru.ifmo.rain.shelepov/concurrent/IterativeParallelism.java
+java -cp out/concurrent_build -p artifacts:lib -m info.kgeorgiy.java.advanced.concurrent list ru.ifmo.rain.shelepov.concurrent.IterativeParallelism
