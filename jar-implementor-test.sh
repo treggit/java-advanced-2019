@@ -1,0 +1,2 @@
+javac -d out/implementor_build -cp artifacts/info.kgeorgiy.java.advanced.implementor.jar java/ru.ifmo.rain.shelepov/implementor/Implementor.java
+java -cp out/implementor_build -p artifacts:lib -m info.kgeorgiy.java.advanced.implementor jar-class ru.ifmo.rain.shelepov.implementor.Implementor
