@@ -2,6 +2,7 @@ package ru.ifmo.rain.shelepov.concurrent;
 
 import info.kgeorgiy.java.advanced.concurrent.ListIP;
 import info.kgeorgiy.java.advanced.concurrent.ScalarIP;
+import info.kgeorgiy.java.advanced.mapper.ParallelMapper;
 
 import java.util.*;
 import java.util.function.Function;
@@ -9,8 +10,17 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 
 public class IterativeParallelism implements ListIP {
+
+    private ParallelMapper mapper;
+
+    public IterativeParallelism(ParallelMapper mapper) {
+        this.mapper = mapper;
+    }
 
     private <T> List<Stream<? extends T>> packItems(List<? extends T> items, int number) {
         int basketSize = items.size() / number;
@@ -33,28 +43,32 @@ public class IterativeParallelism implements ListIP {
 
     private <R, T> R runTask(int threads, List<? extends T> items,
                              Function<? super Stream<? extends T>, ? extends R> functor,
-                             Function<? super Stream<? extends R>, ? extends R> collector) {
+                             Function<? super Stream<? extends R>, ? extends R> collector) throws InterruptedException {
 
-        if (threads > items.size()) {
-            threads = 1;
-        }
+        threads = max(1, min(threads, items.size()));
         List<Stream<? extends T>> packedItems = packItems(items, threads);
-        List<R> result = new ArrayList<>(Collections.nCopies(threads, null));
+        List<R> result;
         List<Thread> workers = new ArrayList<>();
 
-        for (int i = 0; i < threads; i++) {
-            final int index = i;
-            Thread worker = new Thread(() -> result.set(index, functor.apply(packedItems.get(index))));
-            worker.start();
-            workers.add(worker);
+        if (mapper != null) {
+            result = mapper.map(functor, packedItems);
+        } else {
+            result = new ArrayList<>(Collections.nCopies(threads, null));
+            for (int i = 0; i < threads; i++) {
+                final int index = i;
+                Thread worker = new Thread(() -> result.set(index, functor.apply(packedItems.get(index))));
+                worker.start();
+                workers.add(worker);
+            }
         }
 
-        try {
-            for (Thread worker : workers) {
+
+        for (Thread worker : workers) {
+            try {
                 worker.join();
+            } catch (InterruptedException e) {
+                System.out.println("Couldn't join all threads");
             }
-        } catch (InterruptedException e) {
-            System.out.println("Couldn't join all threads");
         }
 
         return collector.apply(result.stream());
@@ -75,9 +89,7 @@ public class IterativeParallelism implements ListIP {
 
     public <T> boolean all(int threads, List<? extends T> values, Predicate<? super T> predicate) throws InterruptedException {
 
-        return runTask(threads, values,
-                stream -> stream.allMatch(predicate),
-                stream -> stream.allMatch(b -> (b == true)));
+        return !any(threads, values, predicate.negate());
     }
 
     public <T> boolean any(int threads, List<? extends T> values, Predicate<? super T> predicate) throws InterruptedException {
