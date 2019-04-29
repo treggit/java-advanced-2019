@@ -3,6 +3,43 @@
 [Условия домашних заданий](http://www.kgeorgiy.info/courses/java-advanced/homeworks.html)
 
 
+## Домашнее задание 10. HelloUDP
+
+Тестирование
+
+ * простой вариант:
+    * клиент:
+        ```info.kgeorgiy.java.advanced.hello client <полное имя класса>```
+    * сервер:
+        ```info.kgeorgiy.java.advanced.hello server <полное имя класса>```
+ * сложный вариант:
+    * клиент:
+        ```info.kgeorgiy.java.advanced.hello client-i18n <полное имя класса>```
+    * сервер:
+        ```info.kgeorgiy.java.advanced.hello server-i18n <полное имя класса>```
+
+Исходный код тестов:
+
+* [Клиент](modules/info.kgeorgiy.java.advanced.hello/info/kgeorgiy/java/advanced/hello/HelloClientTest.java)
+* [Сервер](modules/info.kgeorgiy.java.advanced.hello/info/kgeorgiy/java/advanced/hello/HelloServerTest.java)
+
+
+## Домашнее задание 9. Web Crawler
+
+Тестирование
+
+ * простой вариант:
+    ```info.kgeorgiy.java.advanced.crawler easy <полное имя класса>```
+ * сложный вариант:
+    ```info.kgeorgiy.java.advanced.crawler hard <полное имя класса>```
+
+Исходный код тестов:
+
+* [интерфейсы и вспомогательные классы](modules/info.kgeorgiy.java.advanced.crawler/info/kgeorgiy/java/advanced/crawler/)
+* [простой вариант](modules/info.kgeorgiy.java.advanced.crawler/info/kgeorgiy/java/advanced/crawler/CrawlerEasyTest.java)
+* [сложный вариант](modules/info.kgeorgiy.java.advanced.crawler/info/kgeorgiy/java/advanced/crawler/CrawlerHardTest.java)
+
+
 ## Домашнее задание 8. Параллельный запуск
 
 Тестирование
