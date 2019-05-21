@@ -114,7 +114,7 @@ public class ParallelMapperImpl implements ParallelMapper {
         for (Thread thread : threadPool) {
             try {
                 thread.join();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
 
             }
         }

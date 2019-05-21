@@ -88,7 +88,6 @@ public class IterativeParallelism implements ListIP {
     }
 
     public <T> boolean all(int threads, List<? extends T> values, Predicate<? super T> predicate) throws InterruptedException {
-
         return !any(threads, values, predicate.negate());
     }
 
